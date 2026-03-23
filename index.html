@@ -253,19 +253,6 @@
   .set-input:focus { outline: none; border-color: var(--accent); }
   .set-input.done-input { border-color: var(--success); background: #0a1a10; }
 
-  /* Cardio row */
-  .cardio-sets-header {
-    display: grid;
-    grid-template-columns: 32px 1fr 1fr 36px;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-    padding: 0 4px;
-  }
-
   .check-btn {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -744,18 +731,26 @@ function saveData(data) {
 function defaultTemplates() {
   return [
     { id: 't1', name: 'PUSH DAY', exercises: [
-        { name: 'Bench Press', type: 'strength' },
-        { name: 'Overhead Press', type: 'strength' },
-        { name: 'Incline Dumbbell Press', type: 'strength' },
-        { name: 'Tricep Pushdowns', type: 'strength' },
-        { name: 'Lateral Raises', type: 'strength' },
+        { name: 'Incline Chest Press', type: 'strength' },
+        { name: 'Shoulder Press', type: 'strength' },
+        { name: 'Tricep Push Downs', type: 'strength' },
+        { name: 'Tricep Extension', type: 'strength' },
+        { name: 'Single Arm Tricep Push Down', type: 'strength' },
+        { name: 'Converging Chest Press', type: 'strength' },
+        { name: 'Pec Dec Fly', type: 'strength' },
+        { name: 'Lateral Raise', type: 'strength' }
     ]},
     { id: 't2', name: 'PULL DAY', exercises: [
-        { name: 'Deadlift', type: 'strength' },
-        { name: 'Barbell Row', type: 'strength' },
-        { name: 'Pull-Ups', type: 'strength' },
+        { name: 'Lat Pulldown Supinated', type: 'strength' },
+        { name: 'Lat Pulldown Neutral', type: 'strength' },
+        { name: 'Lat Row', type: 'strength' },
+        { name: 'Wide Row', type: 'strength' },
+        { name: 'Rear Delt Overhead Pullover', type: 'strength' },
         { name: 'Face Pulls', type: 'strength' },
-        { name: 'Bicep Curls', type: 'strength' },
+        { name: 'EZ Bar Bicep Curl', type: 'strength' },
+        { name: 'Dumbbell Curl', type: 'strength' },
+        { name: 'Curl Machine', type: 'strength' },
+        { name: 'Rear Delt Fly', type: 'strength' }
     ]},
     { id: 't3', name: 'LEG DAY', exercises: [
         { name: 'Squat', type: 'strength' },
@@ -774,7 +769,7 @@ function defaultTemplates() {
 
 // ─── STATE ──────────────────────────────────────────────────────────
 let appData = loadData();
-let activeWorkout = null; // { name, startTime, exercises: [] }
+let activeWorkout = null;
 let timerInterval = null;
 let selectedExType = 'strength';
 
@@ -826,14 +821,13 @@ function startTimer() {
     const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2,'0');
     const s = (elapsed % 60).toString().padStart(2,'0');
     const el = document.getElementById('workoutTimer');
-    el.textContent = `${h}:${m}:${s}`;
+    el.textContent = `\( {h}: \){m}:${s}`;
     el.classList.add('running');
   }, 1000);
 }
 
 function finishWorkout() {
   if (!activeWorkout) return;
-  // Collect current data
   collectExerciseData();
   if (activeWorkout.exercises.length === 0) { showToast('Add at least one exercise!'); return; }
 
@@ -939,11 +933,11 @@ function renderExercises() {
       ex.sets.forEach((set, si) => {
         const doneClass = set.done ? 'done' : '';
         setsHtml += `
-          <div class="set-row" data-ex="${ei}" data-si="${si}">
-            <div class="set-num ${doneClass}">${si+1}</div>
-            <input class="set-input wt-input ${set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value="${set.weight}" min="0" step="0.5">
-            <input class="set-input reps-input ${set.done?'done-input':''}" type="number" inputmode="numeric" placeholder="0" value="${set.reps}" min="0">
-            <button class="check-btn ${doneClass}" onclick="toggleSetDone(${ei},${si})">
+          <div class="set-row" data-ex="\( {ei}" data-si=" \){si}">
+            <div class="set-num \( {doneClass}"> \){si+1}</div>
+            <input class="set-input wt-input \( {set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value=" \){set.weight}" min="0" step="0.5">
+            <input class="set-input reps-input \( {set.done?'done-input':''}" type="number" inputmode="numeric" placeholder="0" value=" \){set.reps}" min="0">
+            <button class="check-btn \( {doneClass}" onclick="toggleSetDone( \){ei},${si})">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
           </div>`;
@@ -953,11 +947,11 @@ function renderExercises() {
       ex.sets.forEach((set, si) => {
         const doneClass = set.done ? 'done' : '';
         setsHtml += `
-          <div class="set-row" data-ex="${ei}" data-si="${si}">
-            <div class="set-num ${doneClass}">${si+1}</div>
-            <input class="set-input dist-input ${set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value="${set.distance}" min="0" step="0.1">
-            <input class="set-input mins-input ${set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value="${set.duration}" min="0" step="0.5">
-            <button class="check-btn ${doneClass}" onclick="toggleSetDone(${ei},${si})">
+          <div class="set-row" data-ex="\( {ei}" data-si=" \){si}">
+            <div class="set-num \( {doneClass}"> \){si+1}</div>
+            <input class="set-input dist-input \( {set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value=" \){set.distance}" min="0" step="0.1">
+            <input class="set-input mins-input \( {set.done?'done-input':''}" type="number" inputmode="decimal" placeholder="0" value=" \){set.duration}" min="0" step="0.5">
+            <button class="check-btn \( {doneClass}" onclick="toggleSetDone( \){ei},${si})">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
           </div>`;
@@ -980,12 +974,10 @@ function renderExercises() {
       </div>`;
   }).join('');
 
-  // Update workout name live
   document.getElementById('statusTitle').textContent =
     document.getElementById('workoutNameInput').value || 'WORKOUT';
 }
 
-// Watch name input
 document.getElementById('workoutNameInput').addEventListener('input', function() {
   document.getElementById('statusTitle').textContent = this.value || 'WORKOUT';
 });
@@ -1014,7 +1006,7 @@ function renderHistory() {
           <span class="history-stat"><strong>${exCount}</strong> exercises</span>
           <span class="history-stat"><strong>${setCount}</strong> sets</span>
           <span class="history-stat"><strong>${duration}</strong></span>
-          ${totalVol > 0 ? `<span class="history-stat"><strong>${Math.round(totalVol).toLocaleString()}</strong> vol</span>` : ''}
+          \( {totalVol > 0 ? `<span class="history-stat"><strong> \){Math.round(totalVol).toLocaleString()}</strong> vol</span>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -1033,7 +1025,7 @@ function openModal(wid) {
         `<div style="display:grid;grid-template-columns:28px 1fr 1fr;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
           <span style="color:var(--muted);font-family:'Bebas Neue';font-size:15px;">${i+1}</span>
           <span>${s.weight||0} kg × ${s.reps||0} reps</span>
-          <span style="color:${s.done?'var(--success)':'var(--muted)'}">${s.done?'✓ Done':'—'}</span>
+          <span style="color:\( {s.done?'var(--success)':'var(--muted)'}"> \){s.done?'✓ Done':'—'}</span>
         </div>`).join('');
     } else {
       rows = ex.sets.map((s,i) =>
@@ -1046,7 +1038,7 @@ function openModal(wid) {
     const badge = ex.type==='cardio'?'<span class="exercise-type-badge badge-cardio">cardio</span>':'<span class="exercise-type-badge badge-strength">strength</span>';
     return `<div style="margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <strong style="font-size:14px;">${ex.name}</strong>${badge}
+        <strong style="font-size:14px;">\( {ex.name}</strong> \){badge}
       </div>${rows}</div>`;
   }).join('') + `<button class="start-btn danger" style="margin-top:8px;font-size:15px;" onclick="deleteWorkout('${w.id}')">🗑 DELETE WORKOUT</button>`;
   document.getElementById('historyModal').classList.add('open');
@@ -1065,7 +1057,6 @@ function deleteWorkout(wid) {
 
 // ─── PROGRESS ────────────────────────────────────────────────────────
 function renderProgress() {
-  // Overall stats
   const total = appData.workouts.length;
   const totalDur = appData.workouts.reduce((a,w)=>a+w.duration,0);
   const allEx = [...new Set(appData.workouts.flatMap(w=>w.exercises.map(e=>e.name)))];
@@ -1077,12 +1068,11 @@ function renderProgress() {
     <div class="stat-card"><div class="stat-card-label">Total Sets</div><div class="stat-card-value">${totalSets}</div></div>
     <div class="stat-card"><div class="stat-card-label">Exercises</div><div class="stat-card-value">${allEx.length}</div></div>`;
 
-  // Populate select
   const sel = document.getElementById('progressExSelect');
   const cur = sel.value;
   const strengthEx = [...new Set(appData.workouts.flatMap(w=>w.exercises.filter(e=>e.type==='strength').map(e=>e.name)))].sort();
   sel.innerHTML = '<option value="">— select exercise —</option>' +
-    strengthEx.map(n=>`<option value="${n}" ${n===cur?'selected':''}>${n}</option>`).join('');
+    strengthEx.map(n=>`<option value="${n}" \( {n===cur?'selected':''}> \){n}</option>`).join('');
   renderProgressChart();
 }
 
@@ -1091,14 +1081,12 @@ function renderProgressChart() {
   const container = document.getElementById('chartContainer');
   if (!ex) { container.style.display = 'none'; return; }
 
-  // Gather max weight per workout session
   const points = [];
   [...appData.workouts].reverse().forEach(w => {
     const found = w.exercises.find(e=>e.name===ex && e.type==='strength');
     if (found) {
       const maxW = Math.max(...found.sets.map(s=>s.weight||0));
-      const maxVol = found.sets.reduce((a,s)=>a+(s.weight||0)*(s.reps||0),0);
-      points.push({ date: new Date(w.date), maxW, maxVol });
+      points.push({ date: new Date(w.date), maxW });
     }
   });
 
@@ -1107,11 +1095,6 @@ function renderProgressChart() {
   document.getElementById('chartLabel').textContent = ex + ' — Max Weight (kg/lbs)';
 
   drawLineChart('progressChart', points.map(p=>p.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})), points.map(p=>p.maxW));
-
-  // PR
-  const pr = Math.max(...points.map(p=>p.maxW));
-  const prDate = points.find(p=>p.maxW===pr)?.date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  document.getElementById('chartLabel').innerHTML = `${ex} — Max Weight &nbsp;<span class="pr-badge">🏆 PR ${pr} kg · ${prDate}</span>`;
 }
 
 function drawLineChart(canvasId, labels, data) {
@@ -1129,14 +1112,13 @@ function drawLineChart(canvasId, labels, data) {
   const pad = { top: 16, right: 16, bottom: 36, left: 40 };
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
-  const min = Math.min(...data) * 0.9;
-  const max = Math.max(...data) * 1.08;
+  const min = Math.min(...data) * 0.9 || 0;
+  const max = Math.max(...data) * 1.08 || 10;
   const range = max - min || 1;
 
   const px = (i) => pad.left + (i / (data.length-1||1)) * cW;
   const py = (v) => pad.top + cH - ((v - min) / range) * cH;
 
-  // Grid
   ctx.strokeStyle = '#1e1e1e';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
@@ -1150,11 +1132,9 @@ function drawLineChart(canvasId, labels, data) {
   }
 
   if (data.length < 2) {
-    // Just a dot
     ctx.fillStyle = '#e8ff47';
     ctx.beginPath(); ctx.arc(px(0), py(data[0]), 5, 0, Math.PI*2); ctx.fill();
   } else {
-    // Gradient fill
     const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
     grad.addColorStop(0, 'rgba(232,255,71,0.25)');
     grad.addColorStop(1, 'rgba(232,255,71,0)');
@@ -1167,7 +1147,6 @@ function drawLineChart(canvasId, labels, data) {
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Line
     ctx.beginPath();
     ctx.strokeStyle = '#e8ff47';
     ctx.lineWidth = 2;
@@ -1176,7 +1155,6 @@ function drawLineChart(canvasId, labels, data) {
     for (let i=1;i<data.length;i++) ctx.lineTo(px(i), py(data[i]));
     ctx.stroke();
 
-    // Dots
     data.forEach((v,i) => {
       ctx.beginPath();
       ctx.fillStyle = '#e8ff47';
@@ -1185,7 +1163,6 @@ function drawLineChart(canvasId, labels, data) {
     });
   }
 
-  // X labels (show max 6)
   ctx.fillStyle = '#555';
   ctx.font = '10px DM Sans';
   ctx.textAlign = 'center';
@@ -1202,7 +1179,7 @@ function renderTemplates() {
   list.innerHTML = appData.templates.map(t => `
     <div class="template-card" onclick="loadTemplate('${t.id}')">
       <div class="template-name">${t.name}</div>
-      <div class="template-exercises">${t.exercises.map(e=>`<span class="template-tag">${e.name}</span>`).join('')}</div>
+      <div class="template-exercises">\( {t.exercises.map(e=>`<span class="template-tag"> \){e.name}</span>`).join('')}</div>
     </div>`).join('');
 }
 
